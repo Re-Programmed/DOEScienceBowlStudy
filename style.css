@@ -1,0 +1,119 @@
+:root
+{
+    --default-bg: #27273b;
+    --medium-bg: #37374d;
+    --light-bg: #494969;
+    --default-font: monospace;
+    --default-font-color: #EEEEEE;
+}
+
+#q_box
+{
+    background-color: #2c2c41;
+    border: 3px solid #2c2c41;
+    border-radius: 10px;
+    margin: 15px;
+    padding: 7px;
+}
+
+body
+{
+    background-color: var(--default-bg);
+    font-family: var(--default-font);
+    color: var(--default-font-color);
+
+    font-size: 1.2em;
+}
+
+button
+{
+    background-color: var(--light-bg);
+    border: solid 3px var(--medium-bg);
+    color: var(--default-font);
+    font-family: var(--default-font);
+    padding: 7px;
+
+    transition-duration: 0.2s;
+}
+
+button:hover
+{
+    background-color: var(--medium-bg);
+    transform: scale(1.05);
+}
+
+input, select
+{
+    background-color: var(--light-bg);
+    border: solid 1px var(--medium-bg);
+    outline: none;
+    color: var(--default-font-color);
+    font-family: var(--default-font);
+    width: 25%;
+    padding: 7px;
+
+    margin-left: 15px;
+
+    transition-duration: 0.2s;
+}
+
+.set_option
+{
+    margin-top: 7px;
+}
+
+#stat_box, #option_box, #select_question_set, #abt_info
+{
+    background-color: #2c2c41;
+    margin-left: 15px;
+    margin-top: 15px;
+    width: calc(45% + 2px);
+    padding: 7px;
+}
+
+input:hover, select:hover
+{
+    background-color: var(--medium-bg);
+}
+
+input:active, input::selection
+{
+    background-color: rgb(54, 54, 82);    
+}
+
+@keyframes type_char_animation_POP {
+    from {font-size: 0px;}
+    to {font-size: 1.2em;}
+}
+
+@keyframes type_char_animation_FADE {
+    from {color: #EEEEEE00;}
+    to {color: #EEEEEE;}
+}
+
+chpop
+{
+    animation-name: type_char_animation_POP;
+    animation-duration: 0.2s;   
+    transition-duration: 0.2s;
+}
+
+chfade
+{
+    animation-name: type_char_animation_FADE;
+    animation-duration: 0.2s;   
+    transition-duration: 0.2s;
+
+}
+
+
+.CountdownNumber
+{
+  position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    z-index: 7;
+    font-family: Arial, Helvetica, sans-serif;
+}
