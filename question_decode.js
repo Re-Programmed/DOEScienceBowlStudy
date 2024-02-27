@@ -24,9 +24,15 @@ const randomAnimationTypingOptions = ["chfade", "chpop", "chnone"]
 var randomAnimationTyping = "chfade";
 
 window.addEventListener('load', function () {
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+
+    if(urlParams.has("online")){return;}
+
     randomAnimationTyping = randomAnimationTypingOptions[Math.floor(Math.random() * randomAnimationTypingOptions.length)];
     console.log(randomAnimationTyping);
    LoadSettings();
+   LoadAvailableRooms();
 })
 
 window.addEventListener('keydown', function(event) {
@@ -44,6 +50,41 @@ window.addEventListener('keydown', function(event) {
         }
     }
 })
+
+//#region ONLINE STUFF
+
+//%roomID%
+const AVAILABLE_ROOM_HTML = `
+    <center style="border-top: %bt%;"><p style="width: 25%;display: inline-block;">%roomID%</p><p style="width: 25%;display: inline-block;">%numPlayers%</p></center>
+`
+
+function LoadAvailableRooms()
+{
+    loadRoomHTML({ id: "Room ID", data: "{\"numPlayers\": \"Players\"}" }, "1px solid white")
+    APIData.GetAvailableRooms().then(avRooms => {
+        avRooms.forEach(room => {
+            loadRoomHTML(room);
+        })
+    })
+}
+
+const loadRoomHTML = (room, bt = "none") => {
+    var div = document.createElement("div");
+    div.className = "available_room";
+    div.innerHTML = AVAILABLE_ROOM_HTML.replace(/%roomID%/g, room.id).replace(/%numPlayers%/g, JSON.parse(room.data).numPlayers).replace("%bt%", bt);
+    div.setAttribute("room_data", btoa(JSON.stringify(room)));
+
+    if(room.id != "Room ID")
+    {
+        div.addEventListener('click', function () {
+            DisplayJoinGamePopup(JSON.parse(atob(this.getAttribute("room_data"))));
+        });
+    }
+
+    document.getElementById("room_listing").appendChild(div);
+}
+
+//#endregion ONLINE STUFF
 
 //Loads settings from local storage.
 function LoadSettings()
@@ -427,9 +468,13 @@ function LoadPoints()
     {
         var cCheck = Math.floor(atob(preCheck));
         
-        var pHist = JSON.parse(atob(localStorage.getItem("science_bowl_quiz_af2252024_pointshistory")));
-        pointHistory = pHist;
-        
+        if(localStorage.getItem("science_bowl_quiz_af2252024_pointshistory") != null){
+            var pHist = JSON.parse(atob(localStorage.getItem("science_bowl_quiz_af2252024_pointshistory")));
+            pointHistory = pHist;
+            
+        }
+
+
         UpdatePoints(cCheck, false);
     }else{
         UpdatePoints(0, false);
@@ -641,4 +686,35 @@ function quakeOnce()
   setTimeout(() => {
     document.getElementsByTagName('body')[0].setAttribute("style", "margin-left: 0px;");
   }, 45);
+}
+
+function DisplayJoinGamePopup(game)
+{
+    document.getElementById("join_game_popup").setAttribute("style", "");
+
+    var nGame = {id: game.id, data: JSON.parse(game.data)};
+    console.log(nGame)
+
+    var playerList = "";
+
+    playerList += "<em style='color: gold;'>" + nGame.data.players[0].name + " - Team " + nGame.data.players[0].team + "</em><br>";
+
+    for(var i = 1; i < nGame.data.players.length; i++)
+    {
+        playerList += nGame.data.players[i].name + " - Team " + nGame.data.players[i].team + "<br>";
+    }
+
+    document.getElementById("room_details_display").innerHTML = `
+        Players:<br><br>${playerList}
+    `;
+
+    document.getElementById("room_settings_display").innerHTML = `
+        Toss-Up Time: ${nGame.data.settings.Time.TossUp}s<br>
+        Bonus Time: ${nGame.data.settings.Time.Bonus}s<br>
+        Read Speed: ${nGame.data.settings.ReadSpeed}ms/c<br>
+        Question Delay: ${nGame.data.settings.QuestionDelay}s<br>
+        Display Answers: ${nGame.data.settings.DisplayAnswerOnFail ? "Yes" : "No"}
+    `;
+
+    document.getElementById("join_game_button").setAttribute("code", game.id);
 }

@@ -7,8 +7,10 @@
     <link rel="stylesheet" href="./style.css" type="text/css">
 </head>
 <body>
+    <script src="./online/online_data_manager.js"></script>
     <script src="question_sets.js"></script>
     <script src="question_decode.js"></script>
+    <script src="./online/o_game.js"></script>
 
     <h1 id="CountdownNumber" class="CountdownNumber" style="visibility: hidden;">1</h1>
 
@@ -38,6 +40,10 @@
         <p id="timer_track"></p>
 
         
+    </div>
+
+    <div id="room_listing">
+        <h4 style="margin-top: 0px;margin-left:0px;">Available Rooms</h4>
     </div>
 
     <div id="select_question_set">
@@ -72,6 +78,7 @@
         <button class="set_option" my_set="2" onclick="OptSelButton(this, true); SelectQSetButton(6, this.getAttribute('optsel') == 'true');" optsel="false">2017 Set 11, Round 7</button>
         <button class="set_option" my_set="3" onclick="OptSelButton(this, true); SelectQSetButton(7, this.getAttribute('optsel') == 'true');" optsel="false">Set 12, Round 13</button>
     </div>
+
 
     <div>
         <input id="long_answer_input" style="display: none;">
@@ -128,6 +135,16 @@
         </div>
 
     </div>
+
+    <div id="join_game_popup" style="display: none;"><center>
+        <h1>Join?</h1>
+        <h3>Room Details</h3>
+        <p id="room_details_display"></p>
+        <h3>Room Settings</h3>
+        <p id="room_settings_display"></p>
+        <button style="background-color: #007700;" id="join_game_button" onclick="window.open(window.location.href.replace('/index.html', '') + '/online/index.html?online=' + this.getAttribute('code'), '_self')">Join</button>
+        <button style="background-color: #770000;" id="join_game_button_cancel" onclick="document.getElementById('join_game_popup').setAttribute('style', 'display: none;')">Cancel</button>
+    </center></div>
 
     <div id="abt_info">
         <h4>Question Formatting</h4>

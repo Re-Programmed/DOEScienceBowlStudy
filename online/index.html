@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Science Bowl Practice - Online</title>
+    <link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+    <script src="./online_data_manager.js"></script>
+    <script src="../question_sets.js"></script>
+    <script src="../question_decode.js"></script>
+    <script src="./o_game.js"></script>
+
+    <h1 id="CountdownNumber" class="CountdownNumber" style="visibility: hidden;">1</h1>
+
+    <div id="q_box">
+        <div id="host_wait_screen"></div>
+        
+        <p id="question"></p>
+        <div>
+            <p id="question_option_w" class="question_option"></p>
+            <p id="question_option_x" class="question_option"></p>
+            <p id="question_option_y" class="question_option"></p>
+            <p id="question_option_z" class="question_option"></p>
+        </div>
+
+        <p id="set_num_display" style="color: #616161; font-size: 12px;"><em></em></p>
+
+        <p id="timer_track"></p>
+
+        
+    </div>
+
+    <div id="select_question_set">
+        <h4>Select Question Set</h4>
+        <button id="all_btn_select_mode" onclick="
+        if(this.textContent == 'None')
+        {
+            this.textContent = 'All';
+            for(var i = 4; i < this.parentElement.children.length; i++)
+            {
+                if(this.parentElement.children[i].getAttribute('optsel') == 'true')
+                {
+                    OptSelButton(this.parentElement.children[i]);
+                    SelectQSetButton(Math.floor(this.parentElement.children[i].getAttribute('my_set')) + 4, false);
+                }
+            }
+            return;
+        }
+        for(var i = 4; i < this.parentElement.children.length; i++)
+        {
+            if(this.parentElement.children[i].getAttribute('optsel') == 'false')
+            {
+                OptSelButton(this.parentElement.children[i]);
+                SelectQSetButton(Math.floor(this.parentElement.children[i].getAttribute('my_set')) + 4, true);
+            }
+        }
+        this.textContent = 'None';
+        ">All</button>
+        <br><br>
+        <button class="set_option" my_set="0" onclick="OptSelButton(this, true); SelectQSetButton(4, this.getAttribute('optsel') == 'true');" optsel="false">2009 Set 1, Round 1</button>
+        <button class="set_option" my_set="1" onclick="OptSelButton(this, true); SelectQSetButton(5, this.getAttribute('optsel') == 'true');" optsel="false">2009 Set 1, Round 2</button>
+        <button class="set_option" my_set="2" onclick="OptSelButton(this, true); SelectQSetButton(6, this.getAttribute('optsel') == 'true');" optsel="false">2017 Set 11, Round 7</button>
+        <button class="set_option" my_set="3" onclick="OptSelButton(this, true); SelectQSetButton(7, this.getAttribute('optsel') == 'true');" optsel="false">Set 12, Round 13</button>
+    </div>
+
+    <div>
+        <input id="long_answer_input" style="display: none;">
+        <button onclick="SubmitButton()" id="submit_button" style="display: none;">Submit</button>
+    </div>
+
+    <div id="option_box">
+        <h4 style="width: 100%; margin: 0;text-align: center;">Options</h4>
+
+        <div style="display: flex; justify-content: flex-start;">
+            <p style="width: 15%;">Time (s):</p>
+            <input id="toss_up_setting" style="width: 35%;margin: 5px;" placeholder="Toss-Up question time" oninput="GameOptions.Time.TossUp = Math.floor(this.value);SaveSettings();HOST_UpdateSettings();">
+            <input id="bonus_setting" style="width: 35%;margin: 5px;" placeholder="Bonus question time" oninput="GameOptions.Time.Bonus = Math.floor(this.value);SaveSettings();HOST_UpdateSettings();">
+        </div>
+        <div style="display: flex; justify-content: flex-start;">
+            <p style="width: 30%;">Read Speed (ms/c):</p>
+            <input id="read_speed_setting" style="width: 35%;margin: 5px;" placeholder="Read speed" oninput="GameOptions.ReadSpeed = Math.floor(this.value);SaveSettings();HOST_UpdateSettings();">
+        </div>
+
+        <div style="display: flex; justify-content: flex-start;">
+            <p style="width: 30%;">Question Delay (s):</p>
+            <input id="question_delay_setting" style="width: 35%;margin: 5px;" placeholder="Question delay" oninput="GameOptions.QuestionDelay = Math.floor(this.value); if(GameOptions.QuestionDelay <= 0){GameOptions.QuestionDelay = 1;} SaveSettings();HOST_UpdateSettings();">
+        </div>
+
+        <div style="display: flex; justify-content: flex-start;">
+            <p style="width: 30%;">Show answers on fail:</p>
+            <input id="answer_view_setting" style="width: 35%;margin: 5px;" placeholder="Question delay" type="checkbox" oninput="GameOptions.DisplayAnswerOnFail = this.checked;SaveSettings();HOST_UpdateSettings();">
+        </div>
+
+        <div style="display: flex; justify-content: flex-start;">
+            <p style="width: 30%;">Type Animation:</p>
+            <select name="type_animation_setting" id="type_animation_setting" style="width: 35%;margin: 5px;" oninput="GameOptions.TypingAnimation = this.value;SaveSettings();HOST_UpdateSettings();">
+                <option value="random">Random</option>
+                <option value="chpop">Pop</option>
+                <option value="chfade">Fade</option>
+                <option value="chnone">None</option>
+            </select>
+        </div>
+
+    </div>
+
+    <div id="abt_info">
+        <h4>Question Formatting</h4>
+        <p>Case and whitespace do not matter.</p>
+        <br>
+        <p>Math Questions: <br>When entering math questions, use "*" for multiply, "/" for divide, "^" for rasing to the power, "sqrt(x)" for square root of x, and "pi" for pi.</p>
+    </div>
+</body>
+</html>
