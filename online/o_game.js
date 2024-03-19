@@ -1,6 +1,22 @@
-/*This file is for managing online games.*/
+/*
+    This file is for managing online games before they have begun.
+*/
 
-var CurrentRoom = { id: "", numPlayers: 0, players: [{name: "", team: "A", ip: ip_local()}], settings: {
+var CurrentRoom = { id: "", numPlayers: 0, players: [{name: "", team: "A", ip: ip_local()}], 
+    gameStarted: false,
+    questionSets: [],
+
+    currentQuestion: {set: 0, qid: 0, type: "toss-up"},
+    currentlyAnswering: {uname: "", prompt: ""},
+    lockedTeam: "",
+
+    timer: 0,
+    betweenQ: false,
+    votes: 0,
+
+    points: {a:0, b:0},
+
+    settings: {
     ReadSpeed: 30,
     QuestionDelay: 3,
     Time: { Bonus: 20, TossUp: 5 },
@@ -17,31 +33,66 @@ window.addEventListener('load', function() {
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
 
-    if(!urlParams.has("online")){return;}
-
-    //Get the requested game code.
-    CurrentRoom.id = urlParams.get("online");
-
-    APIData.GetRoom(CurrentRoom.id).then(room => {
-        if(room == null)
-        {
-            this.document.body.innerHTML = "<h1>That room does not exist!</h1>";
-            return;
-        }
-
-        CurrentRoom = room;
+    if(!urlParams.has("online") || urlParams.has("a_game")){return;}
+    else{
+        //Get the requested game code.
         CurrentRoom.id = urlParams.get("online");
 
-        //The game joined should not have started yet, we need to wait for the host to start...
-        //Assign the players team based on the number of players in the game.
-        //DisplayAwaitingHost();
-        AssignTeam();
-    })
+        APIData.GetRoom(CurrentRoom.id).then(room => {
+            if(room == null)
+            {
+                this.document.body.innerHTML = "<h1>That room does not exist!</h1>";
+                return;
+            }
 
+            CurrentRoom = room;
+            CurrentRoom.id = urlParams.get("online");
+
+            //The game joined should not have started yet, we need to wait for the host to start...
+            //Assign the players team based on the number of players in the game.
+            //DisplayAwaitingHost();
+            AssignTeam();
+        })
+    }
 })
 
+//Updates what question sets will be used in the current room.
+function HOST_UpdateQPacks()
+{
+    APIData.RoomSetQuestionSets(CurrentRoom, SelectedQSetButtons);
+    CurrentRoom.questionSets = SelectedQSetButtons;
+}
+
+function CLIENT_BeginGame()
+{
+    const queryString = window.location.search;
+    window.open(window.location.href.replace(queryString, "").replace("/index.html", "") + "/active/index.html" + queryString + "&a_game=1", "_self");
+}
+
+//Called when the host requests to start the game.
+function HOST_BeginGame(isButton)
+{
+    if(CurrentRoom.players.length < 2)
+    {
+        alert("Not enough players...");
+    }   
+
+    //If this was pressed by the button, create an "are you sure?" screen.
+    if(isButton)
+    {
+        DisplayJoinGamePopup({id: CurrentRoom.id, data: JSON.stringify(CurrentRoom)});
+        return;
+    }
+
+    //Begin the game for everyone.
+    APIData.RoomBeginGame(CurrentRoom).then(d => {
+        CLIENT_BeginGame();
+    })
+}
+
+
 const AWAITING_HOST_SCREEN = `
-    <h4>Waiting for host to start...</h4>
+    %heading%
     <h3>Players:</h3>
     <div style="display: inline-block;width: 48%;padding-left: 15px;min-height: 200px;">
     <h4>Team A</h4>
@@ -69,7 +120,9 @@ function DisplayAwaitingHost()
         }
     }
 
-    document.getElementById("host_wait_screen").innerHTML = AWAITING_HOST_SCREEN.replace("%playersA%", pStringA).replace("%playersB%", pStringB);
+    document.getElementById("host_wait_screen").innerHTML = AWAITING_HOST_SCREEN.replace("%playersA%", pStringA).replace("%playersB%", pStringB).replace("%heading%", !isHost ? "<h4>Waiting for host to start...</h4>" : `
+        <button onclick="HOST_BeginGame(true);" id="host_launch_button">Start</button>
+    `);
 }
 
 //Returns an array of all the players on a given team.
@@ -185,7 +238,7 @@ function AssignTeam()
 
 //Sets up the settings menus for the host to modify before the game has started.
 function HOST_LaunchUI()
-{
+{    
     GameOptions = CurrentRoom.settings;
     UpdateSettingsUI();
 }
@@ -307,6 +360,11 @@ function CLIENT_UpdateCurrentRoom()
         DisplayAwaitingHost();
         GameOptions = CurrentRoom.settings;
         UpdateSettingsUI();
+
+        if(CurrentRoom.gameStarted)
+        {
+            CLIENT_BeginGame();
+        }
     })
 }
 
@@ -328,6 +386,11 @@ function HOST_UpdateCurrentRoom()
         //TODO: MAKE IT SO THAT THIS IS BASED ON IF THE GAME STARTED YET
         //Called on update before the game has started.
         DisplayAwaitingHost();
+
+        if(CurrentRoom.gameStarted)
+        {
+            CLIENT_BeginGame();
+        }
     })
 }
 

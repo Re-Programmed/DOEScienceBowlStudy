@@ -1,4 +1,5 @@
 const API_UPDATE_INTERVAL = 1000 //TODO: MAKE FASTER AND DEPENDENT ON STAGE OF THE GAME, EX. SLOWER FOR BONUS AND BEFORE GAME STARTS, FASTER FOR TOSSUP
+const API_INGAME_UPDATE = 500
 
 const URLS = { FULL_TABLE: "https://tjdzerjw9f.execute-api.us-west-2.amazonaws.com/default?table=ScienceBowlChallenge", ROOM: function(x) { return "https://mnd5defj88.execute-api.us-west-2.amazonaws.com/default/get?table=ScienceBowlChallenge&id=" + x; }, POST: function (id, data) { return "https://qdzmt1ev82.execute-api.us-west-2.amazonaws.com/default/create?table=ScienceBowlChallenge&id=" + id + "&data=" + btoa(data) } }
 
@@ -45,31 +46,137 @@ const APIData = {
     //Player: Account
     RoomAddPlayer: async function (currentRoom, player)
     {
-        var pData = {id: currentRoom.id};
-        pData.data = JSON.parse(JSON.stringify(currentRoom));
-        delete pData.data.id;
+        //Generate API data
+        var pData = GenBasicPData(currentRoom);
 
-        pData.data.numPlayers++;
+        //Modify API data
         pData.data.players.push({name: player.Username, team: player.Team, ip: player.IP});
+        pData.data.numPlayers = pData.data.players.length;
 
         console.log(pData);
 
+        //Send data.
         basicRequest(URLS.POST("room_" + pData.id, JSON.stringify(pData.data)), []);
     },
 
     
     RoomSetSettings: async function (currentRoom, settings)
     {
-        var pData = {id: currentRoom.id};
-        pData.data = JSON.parse(JSON.stringify(currentRoom));
-        delete pData.data.id;
+        PostBasicPData(currentRoom, "settings", settings);
+    },
 
-        pData.data.settings = settings;
+    RoomSetQuestionSets: async function (currentRoom, setArr)
+    {
+        PostBasicPData(currentRoom, "questionSets", setArr);
+    },
+
+    RoomBeginGame: async function (currentRoom)
+    {
+        var pbpd = await PostBasicPData(currentRoom, "gameStarted", true);
+        return pbpd;
+    },
+
+    //Question: {set: int, qid: int, type: string["bonus", "toss-up"]}
+    RoomSetCurrentQuestion: async function (currentRoom, question)
+    {
+        var pData = GenBasicPData(currentRoom);
+
+        pData.data.currentQuestion = question;
+        pData.data.votes = 0;
+        pData.data.lockedTeam = '';
+        pData.data.betweenQ = false;
+
+        var brc = await basicRequest(URLS.POST("room_" + pData.id, JSON.stringify(pData.data)), []);
+        return brc;
+    },
+
+    RoomAnswerQuestion: async function (currentRoom, username, prompt)
+    {
+        var pData = GenBasicPData(currentRoom);
+
+        pData.data.currentlyAnswering = {uname: username, prompt: prompt};
+        //pData.data.betweenQ = true;
+
+        console.log( {uname: username, prompt: prompt} )
+        var brc = await basicRequest(URLS.POST("room_" + pData.id, JSON.stringify(pData.data)), []);
+        return brc;
+    },
+
+    RoomLockTeam: async function (currentRoom, team)
+    {
+        var pData = GenBasicPData(currentRoom);
 
         console.log(pData);
 
-        basicRequest(URLS.POST("room_" + pData.id, JSON.stringify(pData.data)), []);
+        //Set the team to be locked and clear the current answerer in one call.
+        pData.data.lockedTeam = team;
+        pData.data.currentlyAnswering.uname = "";
+        pData.data.currentlyAnswering.prompt = "";
+        console.log(pData);
+
+        var brc = await basicRequest(URLS.POST("room_" + pData.id, JSON.stringify(pData.data)), []);
+        return brc;
+    },
+
+    RoomSetTimer: async function (currentRoom, timer)
+    {
+        var pData = GenBasicPData(currentRoom);
+
+        //Set the team timer.
+        pData.data.timer = timer;
+
+        if(timer < 0)
+        {
+            console.log("BETWEEN Q");
+            pData.data.timer = -1;
+            pData.data.betweenQ = true;
+            pData.data.lockedTeam = "";
+            pData.data.currentlyAnswering.uname = "";
+            pData.data.currentlyAnswering.prompt = "";
+        }
+
+        var brc = await basicRequest(URLS.POST("room_" + pData.id, JSON.stringify(pData.data)), []);
+        return brc;
+    },
+
+    RoomAddVote: async function (currentRoom)
+    {
+        var pbpd = PostBasicPData(currentRoom, "votes", currentRoom.votes + 1);
+        return pbpd;
+    },
+
+    RoomAddPoints: async function (currentRoom, team, points)
+    {
+        var pData = GenBasicPData(currentRoom);
+
+        pData.data.points[team.toLowerCase()] += points;
+
+        var brc = await basicRequest(URLS.POST("room_" + pData.id, JSON.stringify(pData.data)), []);
+        return brc;
     }
+}
+
+//Copies the current room into data that can be sent to the API.
+function GenBasicPData(currentRoom)
+{
+    var pData = {id: currentRoom.id};
+    pData.data = JSON.parse(JSON.stringify(currentRoom));
+    delete pData.data.id;
+
+    return pData;
+}
+
+//Copies the room data into data that can be passed to the API, then updates the given key in the room data and sends a request.
+async function PostBasicPData(currentRoom, key, value)
+{
+    var pData = GenBasicPData(currentRoom);
+
+    pData.data[key] = value;
+
+    console.log(pData);
+
+    var brc = await basicRequest(URLS.POST("room_" + pData.id, JSON.stringify(pData.data)), []);
+    return brc;
 }
 
 async function basicRequest(url, data_points)

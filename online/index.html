@@ -59,10 +59,10 @@
         this.textContent = 'None';
         ">All</button>
         <br><br>
-        <button class="set_option" my_set="0" onclick="OptSelButton(this, true); SelectQSetButton(4, this.getAttribute('optsel') == 'true');" optsel="false">2009 Set 1, Round 1</button>
-        <button class="set_option" my_set="1" onclick="OptSelButton(this, true); SelectQSetButton(5, this.getAttribute('optsel') == 'true');" optsel="false">2009 Set 1, Round 2</button>
-        <button class="set_option" my_set="2" onclick="OptSelButton(this, true); SelectQSetButton(6, this.getAttribute('optsel') == 'true');" optsel="false">2017 Set 11, Round 7</button>
-        <button class="set_option" my_set="3" onclick="OptSelButton(this, true); SelectQSetButton(7, this.getAttribute('optsel') == 'true');" optsel="false">Set 12, Round 13</button>
+        <button class="set_option" my_set="0" onclick="OptSelButton(this, true); SelectQSetButton(4, this.getAttribute('optsel') == 'true');HOST_UpdateQPacks();" optsel="false">2009 Set 1, Round 1</button>
+        <button class="set_option" my_set="1" onclick="OptSelButton(this, true); SelectQSetButton(5, this.getAttribute('optsel') == 'true');HOST_UpdateQPacks();" optsel="false">2009 Set 1, Round 2</button>
+        <button class="set_option" my_set="2" onclick="OptSelButton(this, true); SelectQSetButton(6, this.getAttribute('optsel') == 'true');HOST_UpdateQPacks();" optsel="false">2017 Set 11, Round 7</button>
+        <button class="set_option" my_set="3" onclick="OptSelButton(this, true); SelectQSetButton(7, this.getAttribute('optsel') == 'true');HOST_UpdateQPacks();" optsel="false">Set 12, Round 13</button>
     </div>
 
     <div>
@@ -104,6 +104,16 @@
         </div>
 
     </div>
+
+    <div id="join_game_popup" style="display: none;"><center>
+        <h1>Ready?</h1>
+        <h3>Room Details</h3>
+        <p id="room_details_display"></p>
+        <h3>Room Settings</h3>
+        <p id="room_settings_display"></p>
+        <button style="background-color: #007700;" id="join_game_button" onclick="HOST_BeginGame(false);document.getElementById('join_game_popup').setAttribute('style', 'display: none;');">Start</button>
+        <button style="background-color: #770000;" id="join_game_button_cancel" onclick="document.getElementById('join_game_popup').setAttribute('style', 'display: none;')">Cancel</button>
+    </center></div>
 
     <div id="abt_info">
         <h4>Question Formatting</h4>

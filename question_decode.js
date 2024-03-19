@@ -217,6 +217,11 @@ function SubmitButton(ignoreInput = false, justadv = false)
         }}
     }
    
+   DisplayAnswer(justadv, wasCorrect);
+}
+
+function DisplayAnswer(justadv, wasCorrect, cButton = "" /*What to make the onclick event of the continue button.*/)
+{
     ClearMultipleChoice();
     DelayFunction(function () {
 
@@ -233,9 +238,19 @@ function SubmitButton(ignoreInput = false, justadv = false)
                 }
             }
 
-            document.getElementById("question").innerHTML += "<br><br><em>You Said</em>: <br><p style='color:" + (wasCorrect ? "lime" : "red") + ";'>" + lastAnswerGiven + "</p>"; 
+            if(lastAnswerGiven != "")
+            {
+                document.getElementById("question").innerHTML += "<br><br><em>You Said</em>: <br><p style='color:" + (wasCorrect ? "lime" : "red") + ";'>" + lastAnswerGiven + "</p>"; 
+                lastAnswerGiven = ""
+            }
 
-            document.getElementById("question").innerHTML += `<br><br><button onclick="document.getElementById('question').innerHTML = '';IncrementCurrentQuestion(` + wasCorrect + `);">Continue</button>`
+            if(cButton != "")
+            {
+                document.getElementById("question").innerHTML += `<br><br><button id="continue_vote_button" onclick="${cButton}">Continue</button>`
+            }else{
+                document.getElementById("question").innerHTML += `<br><br><button onclick="document.getElementById('question').innerHTML = '';IncrementCurrentQuestion(` + wasCorrect + `);">Continue</button>`
+            }
+            
             return;
         }
 
@@ -306,14 +321,18 @@ function ClearMultipleChoice()
     });
 }
 
+//The current setID.
+var setID = 0;
+
 function IncrementCurrentQuestion(allowBonus = false)
 {
     if(allowBonus && currentQuestion.type == "bonus") {allowBonus = false;}
     questionActive = true;
+
     if(!allowBonus)
     {
+        setID = Math.floor(Math.random() * FullQuestionSet.length);
          //Which selected question set is being used. Choose random question.
-        const setID = Math.floor(Math.random() * FullQuestionSet.length);
         currentQuestionIndex = 1 + Math.floor(Math.random() * QuestionSetCounts[setID]);
 
         //Check if the question has been asked before in this session.
@@ -329,7 +348,7 @@ function IncrementCurrentQuestion(allowBonus = false)
         askedQuestions.push({ q: setID, v: currentQuestionIndex });
     }
 
-    currentQuestion = GetQuestion(currentQuestionIndex, allowBonus ? "bonus" : "toss-up");
+    currentQuestion = GetQuestion(currentQuestionIndex, allowBonus ? "bonus" : "toss-up", setID);
     console.log(currentQuestion);
 
     //Stores the total amount of time that it will take to read out the current question before starting the timer.
@@ -481,6 +500,7 @@ function LoadPoints()
     }
 }
 
+//TODO: ADD TYPING CLICK NOISE
 function TypeOutText(element, text, charDelay)
 {
     if(!questionActive){return;}
@@ -658,8 +678,8 @@ const DisplayAnim = async (num, time = 2000) =>
 function quake(times/*, text, red = false*/) 
 { 
 
-    var audio = new Audio('./sounds/COMBO/combo' + (Math.floor(Math.random() * 4) + 1) + ".wav");
-    audio.play();
+   // var audio = new Audio('./sounds/COMBO/combo' + (Math.floor(Math.random() * 4) + 1) + ".wav");
+   // audio.play();
 
     for(i = 0; i < times; i++)
     {
@@ -697,11 +717,20 @@ function DisplayJoinGamePopup(game)
 
     var playerList = "";
 
-    playerList += "<em style='color: gold;'>" + nGame.data.players[0].name + " - Team " + nGame.data.players[0].team + "</em><br>";
+    if(nGame.data.players.length > 0)
+    {
+        playerList += "<em style='color: " + (nGame.data.players[0].name == GetAccountName() ? "green" : "gold") + ";'>" + nGame.data.players[0].name + " - Team " + nGame.data.players[0].team + "</em><br>";
+    }
 
     for(var i = 1; i < nGame.data.players.length; i++)
     {
-        playerList += nGame.data.players[i].name + " - Team " + nGame.data.players[i].team + "<br>";
+        if(nGame.data.players[i].name == GetAccountName())
+        {
+            playerList += "<em style='color: green;'>" + nGame.data.players[i].name + " - Team " + nGame.data.players[i].team + "</em><br>";
+        }else{
+            playerList += nGame.data.players[i].name + " - Team " + nGame.data.players[i].team + "<br>";
+        }
+
     }
 
     document.getElementById("room_details_display").innerHTML = `

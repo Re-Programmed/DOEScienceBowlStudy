@@ -152,6 +152,13 @@ chfade
 
 }
 
+.center_abs_div
+{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
 
 #join_game_popup
 {
