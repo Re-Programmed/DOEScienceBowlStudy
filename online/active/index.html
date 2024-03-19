@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Science Bowl Practice - Online</title>
+    <link rel="stylesheet" href="../../7seg-font/stylesheet.css" type="text/css">
+    <link rel="stylesheet" href="../../style.css" type="text/css">
+    <link rel="stylesheet" href="./online.css" type="text/css">
+</head>
+<body>
+    <script src="../online_data_manager.js"></script>
+    <script src="../../question_sets.js"></script>
+    <script src="../../question_decode.js"></script>
+    <script src="../o_game.js"></script>
+    <script src="./a_game.js"></script>
+
+    <h1 id="CountdownNumber" class="CountdownNumber" style="visibility: hidden;">1</h1>
+
+    <div id="q_box">
+        <div id="host_wait_screen"></div>
+        
+        <p id="question"></p>
+        <div>
+            <p id="question_option_w" class="question_option"></p>
+            <p id="question_option_x" class="question_option"></p>
+            <p id="question_option_y" class="question_option"></p>
+            <p id="question_option_z" class="question_option"></p>
+        </div>
+
+        <p id="set_num_display" style="color: #616161; font-size: 12px;"><em></em></p>
+
+        <p id="timer_track"></p>
+
+        
+    </div>
+
+    <center><div id="timer_holder"><p id="timer_text">00:00</p></div></center>
+
+    <div id="scratch_paper_bonus">
+        <p>Hello</p>
+        <input>
+        <button>Send</button>
+    </div>
+
+    <div>
+        <input id="long_answer_input">
+        <button onclick="SendAnswer()" id="submit_button">Submit</button>
+    </div>
+
+    <div class="center_abs_div" id="player_answer_talk" style="display: none;">
+        <h2 id="player_answer_talk_name"></h2>
+        <p id="player_answer_talk_ptp"></p>
+    </div>
+
+    <div id="team_holder">
+        <div id="team_a_display">
+            <h2>Team A</h2>
+        </div>
+    
+        <div id="team_b_display">
+            <h2>Team B</h2>
+        </div>
+    </div>
+
+    <div id="begun_popup" class="center_abs_div" style="
+        border: 3px solid white;
+        border-radius: 10px;
+        background-color: var(--default-bg);
+        padding: 15px;
+    ">
+    <center>
+        <h1>The Bowl Has Begun!</h1>
+        <button style="background-color: #004400;" onclick="document.getElementById('begun_popup').remove();">Continue</button>
+    </center>
+    </div>
+
+    <div id="scoreboard_display">
+        <div id="team_a_scoreboard">
+            <h1>Team A: 0</h1> 
+        </div>
+
+        <div id="team_b_scoreboard">
+            <h1>Team B: 0</h1>
+        </div>
+    </div>
+
+    <div id="abt_info" style="width: calc(100% - 36px) !important;">
+        <h4>Question Formatting</h4>
+        <p>Case and whitespace do not matter.</p>
+        <br>
+        <p>Math Questions: <br>When entering math questions, use "*" for multiply, "/" for divide, "^" for rasing to the power, "sqrt(x)" for square root of x, and "pi" for pi.</p>
+    </div>
+</body>
+</html>
