@@ -25,12 +25,16 @@ function LoadSelectedFullSet()
 
 const QuestionSetNames = [
     '2009 Set 1, Round 1',
-    '2009 Set 1, Round 2'
+    '2009 Set 1, Round 2',
+    'Set 11, Round 7',
+    'Set 12, Round 13'
 ]
 
 const QuestionSetCounts = [
     25,
-    25
+    25,
+    23,
+    23
 ]
 
 const QSets = [
@@ -128,7 +132,7 @@ ANSWER: COVALENT
 BONUS
 9) CHEMISTRY Short Answer Name all of the following 4 processes where latent heat is
 absorbed: evaporation; condensation; water melts; water freezes
-ANSWER: EVAPORATION; WATER MELTS
+ANSWER: EVAPORATION; WATER MELTS (in any order)
 TOSS-UP
 10) PHYSICS Short Answer Although not known as such at the time, what was the first form of
 spectacular electric discharge seen by humans?
@@ -345,7 +349,7 @@ locating a part of the human body in relation to another part?
 ANSWER: ANTERIOR
 BONUS
 2) BIOLOGY Short Answer What are the names for the pyrimidine bases found in DNA?
-ANSWER: CYTOSINE; THYMINE
+ANSWER: CYTOSINE; THYMINE (in any order)
  High School Round 2 Page 2
 TOSS-UP
 3) PHYSICS Short Answer According to one of the most common color triangles, if blue and

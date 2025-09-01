@@ -25,6 +25,14 @@ body
     font-size: 1.2em;
 }
 
+button:disabled
+{
+    background-color: #1c1c29;
+    border: 3px solid #2a2a3a;
+
+    color: gray;
+}
+
 button
 {
     background-color: var(--light-bg);
@@ -36,7 +44,7 @@ button
     transition-duration: 0.2s;
 }
 
-button:hover
+button:hover, button:focus, input:focus
 {
     background-color: var(--medium-bg);
     transform: scale(1.05);
@@ -62,7 +70,53 @@ input, select
     margin-top: 7px;
 }
 
-#stat_box, #option_box, #select_question_set, #abt_info
+#room_listing
+{
+    float: right;
+    margin-top: 0px !important;
+    width: 45% !important;
+    margin-right: 15px;
+
+    min-height: 196px;
+}
+
+#room_listing
+{
+    display: flex;
+    flex-direction: column;
+}
+
+.available_room > center
+{
+    border: 1px solid white;
+}
+
+@keyframes fade_up_available_room {
+    from{border: 1px solid #FFFFFF00;color: #FFFFFF00;}
+    to{}
+}
+
+.available_room
+{
+    transition-duration: 0.2s;
+
+    animation-name: fade_up_available_room;
+    animation-duration: 0.3s;
+}
+
+.available_room:hover
+{
+    transform: scale(1.025);
+    border-top: 1px solid white;
+    background-color: #FFFFFF11;
+}
+
+#chat_options
+{
+    height: 75px;
+}
+
+#stat_box, #chat_options, #option_box, #select_question_set, #abt_info, #room_listing, #join_game_popup, #room_options
 {
     background-color: #2c2c41;
     margin-left: 15px;
@@ -74,6 +128,11 @@ input, select
 input:hover, select:hover
 {
     background-color: var(--medium-bg);
+}
+
+input:read-only
+{
+    background-color: #333344;
 }
 
 input:active, input::selection
@@ -106,6 +165,26 @@ chfade
 
 }
 
+.center_abs_div
+{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#join_game_popup
+{
+    background-color: var(--default-bg);
+    border: 5px solid;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 10px;
+
+    min-height: 450px;
+}
 
 .CountdownNumber
 {
@@ -116,4 +195,10 @@ chfade
     color: white;
     z-index: 7;
     font-family: Arial, Helvetica, sans-serif;
+}
+
+.click_green:active, .click_green::selection
+{
+    background-color: #206320;
+    border: 3px solid #1c531c;
 }

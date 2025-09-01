@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Science Bowl Practice</title>
+    <link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+    <script src="../online/online_data_manager.js"></script>
+    <script src="../text_filter.js"></script>
+    <script src="./create_room.js"></script>
+
+    <h1 style="text-align: center;">Create A Room</h1>
+
+    <div id="room_options" style="width: calc(100% - 28px); margin-left: 7px; margin-right: 7px;">
+        <h4 style="width: 100%; margin: 0;text-align: center;">Options</h4>
+        <div style="display: flex; justify-content: flex-start;">
+            <p style="width: 30%;">Room Name:</p>
+            <input id="createroom_room_name_setting" style="width: 35%;margin: 5px;" placeholder="Room name" oninput="">
+        </div>
+        <div style="display: flex; justify-content: flex-start;">
+            <p style="width: 30%;">Max Players:</p>
+            <input id="createroom_room_max_players" style="width: 35%;margin: 5px;" placeholder="Max Players" oninput="">
+        </div>
+
+        <button onclick="CreateRoom()">Create Room</button>
+    </div>
+</body>

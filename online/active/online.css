@@ -1,0 +1,143 @@
+.team_player > p
+{
+    display: inline-block;
+}
+
+.team_player
+{
+    border: 1px solid white;
+    padding: 9px;
+    width: calc(100% - 18px);
+
+    transition-duration: 0.2s;
+}
+
+.team_player:hover
+{
+    background-color: #FFFFFF11;
+}
+
+#scoreboard_display
+{
+    background-color: #2c2c41;
+    display: flex;
+}
+
+#team_a_scoreboard
+{
+    border-right: 1px solid white;
+}
+
+#team_b_scoreboard
+{
+    margin-left: 7px !important;
+}
+
+#scratch_paper_bonus
+{
+    width: 100%;
+    height: 100px;
+}
+
+#scratch_paper_bonus > p
+{
+    margin-left: 15px;
+}
+
+#team_a_scoreboard, #team_b_scoreboard
+{
+    width: 50%;
+    margin: 0;
+    margin-top: 7px;
+    margin-bottom: 7px;
+}
+
+@keyframes point_exp {
+    from{transform: scale(0);color: #00AA0000;}
+    to{}
+}
+
+.points_display_history
+{
+    color: #00AA00;
+    margin-left: 15px;
+
+    animation-name: point_exp;
+    animation-duration: 0.3s;
+}
+
+#team_a_display, #team_b_display
+{
+    border: 3px solid var(--light-bg);
+    background-color: #2c2c41;
+
+    width: calc(50% - 14px);
+
+    padding: 15px;
+    margin: 7px;
+}
+
+#long_answer_input
+{
+    width: calc(100% - 120px) !important;
+    height: 30px;
+}
+
+#team_holder
+{
+    display: flex;
+}
+
+#player_answer_talk
+{
+    border: 3px solid white;
+    border-radius: 10px;
+    background-color: var(--default-bg);
+    padding: 15px;
+}
+
+@keyframes fade-up {
+    from {color: #FFFFFF00;}
+    to {}
+}
+
+@keyframes fade-out {
+    from{}
+    to{color: #FFFFFF00; background-color: #2c2c4100; border: 3px solid #FFFFFF00;}
+}
+
+#timer_holder
+{
+    background-color: #1a1a21;
+    width: 180px;
+    height: 54px;
+    border: 3px solid #464650;
+    padding-top: 1px;
+    margin: 15px;
+}
+
+#timer_text
+{
+    color: red;
+    font-family: '7-Segment', monospace;
+    text-align: center;
+
+    font-size: 3.1em;
+    margin: 0;
+}
+
+@keyframes shake_anim {
+    0%{transform: rotate(0deg);}
+    10%{transform: rotate(6deg);}
+    30%{transform: rotate(-6deg);}
+    50%{transform: rotate(6deg);}
+    70%{transform: rotate(-6deg);}
+    90%{transform: rotate(6deg);}
+    100%{transform: rotate(0deg);}
+}
+
+.shake_anim
+{
+    animation-name: shake_anim;
+    animation-duration: 1s;
+}

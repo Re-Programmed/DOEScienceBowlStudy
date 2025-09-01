@@ -24,9 +24,15 @@ const randomAnimationTypingOptions = ["chfade", "chpop", "chnone"]
 var randomAnimationTyping = "chfade";
 
 window.addEventListener('load', function () {
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+
+    if(urlParams.has("online")){return;}
+
     randomAnimationTyping = randomAnimationTypingOptions[Math.floor(Math.random() * randomAnimationTypingOptions.length)];
     console.log(randomAnimationTyping);
    LoadSettings();
+   LoadAvailableRooms();
 })
 
 window.addEventListener('keydown', function(event) {
@@ -44,6 +50,55 @@ window.addEventListener('keydown', function(event) {
         }
     }
 })
+
+//#region ONLINE STUFF
+
+//%roomID%
+const AVAILABLE_ROOM_HTML = `
+    <center style="border-top: %bt%;"><p style="width: 25%;display: inline-block;">%roomName%</p><p style="width: 25%;display: inline-block;">%roomID%</p><p style="width: 25%;display: inline-block;">%numPlayers%</p></center>
+`
+
+function LoadAvailableRooms()
+{
+    const room_listing = document.getElementById("room_listing");
+    if(room_listing.children.length > 2)
+    {
+       for(var i = 0; i < room_listing.children.length; i++)
+       {
+        if(i > 2)
+        {
+            console.log("REMOVing")
+            room_listing.children[i].remove();
+            i--;
+        }
+       }
+    }
+
+    loadRoomHTML({ id: "Room ID", data: "{\"numPlayers\": \"Players\", \"info\":{\"name\": \"Name\"}}" }, "1px solid white")
+    APIData.GetAvailableRooms().then(avRooms => {
+        avRooms.forEach(room => {
+            loadRoomHTML(room);
+        })
+    })
+}
+
+const loadRoomHTML = (room, bt = "none") => {
+    var div = document.createElement("div");
+    div.className = "available_room";
+    div.innerHTML = AVAILABLE_ROOM_HTML.replace(/%roomID%/g, room.id).replace(/%numPlayers%/g, JSON.parse(room.data).numPlayers + (JSON.parse(room.data).info.maxp != undefined ? "/" + JSON.parse(room.data).info.maxp : "")).replace(/%roomName%/g, JSON.parse(room.data).info.name).replace("%bt%", bt);
+    div.setAttribute("room_data", btoa(JSON.stringify(room)));
+
+    if(room.id != "Room ID")
+    {
+        div.addEventListener('click', function () {
+            DisplayJoinGamePopup(JSON.parse(atob(this.getAttribute("room_data"))));
+        });
+    }
+
+    document.getElementById("room_listing").appendChild(div);
+}
+
+//#endregion ONLINE STUFF
 
 //Loads settings from local storage.
 function LoadSettings()
@@ -176,6 +231,11 @@ function SubmitButton(ignoreInput = false, justadv = false)
         }}
     }
    
+   DisplayAnswer(justadv, wasCorrect);
+}
+
+function DisplayAnswer(justadv, wasCorrect, cButton = "" /*What to make the onclick event of the continue button.*/)
+{
     ClearMultipleChoice();
     DelayFunction(function () {
 
@@ -192,9 +252,19 @@ function SubmitButton(ignoreInput = false, justadv = false)
                 }
             }
 
-            document.getElementById("question").innerHTML += "<br><br><em>You Said</em>: <br><p style='color:" + (wasCorrect ? "lime" : "red") + ";'>" + lastAnswerGiven + "</p>"; 
+            if(lastAnswerGiven != "")
+            {
+                document.getElementById("question").innerHTML += "<br><br><em>You Said</em>: <br><p style='color:" + (wasCorrect ? "lime" : "red") + ";'>" + lastAnswerGiven + "</p>"; 
+                lastAnswerGiven = ""
+            }
 
-            document.getElementById("question").innerHTML += `<br><br><button onclick="document.getElementById('question').innerHTML = '';IncrementCurrentQuestion(` + wasCorrect + `);">Continue</button>`
+            if(cButton != "")
+            {
+                document.getElementById("question").innerHTML += `<br><br><button id="continue_vote_button" onclick="${cButton}">Continue</button>`
+            }else{
+                document.getElementById("question").innerHTML += `<br><br><button onclick="document.getElementById('question').innerHTML = '';IncrementCurrentQuestion(` + wasCorrect + `);">Continue</button>`
+            }
+            
             return;
         }
 
@@ -265,14 +335,18 @@ function ClearMultipleChoice()
     });
 }
 
+//The current setID.
+var setID = 0;
+
 function IncrementCurrentQuestion(allowBonus = false)
 {
     if(allowBonus && currentQuestion.type == "bonus") {allowBonus = false;}
     questionActive = true;
+
     if(!allowBonus)
     {
+        setID = Math.floor(Math.random() * FullQuestionSet.length);
          //Which selected question set is being used. Choose random question.
-        const setID = Math.floor(Math.random() * FullQuestionSet.length);
         currentQuestionIndex = 1 + Math.floor(Math.random() * QuestionSetCounts[setID]);
 
         //Check if the question has been asked before in this session.
@@ -288,7 +362,7 @@ function IncrementCurrentQuestion(allowBonus = false)
         askedQuestions.push({ q: setID, v: currentQuestionIndex });
     }
 
-    currentQuestion = GetQuestion(currentQuestionIndex, allowBonus ? "bonus" : "toss-up");
+    currentQuestion = GetQuestion(currentQuestionIndex, allowBonus ? "bonus" : "toss-up", setID);
     console.log(currentQuestion);
 
     //Stores the total amount of time that it will take to read out the current question before starting the timer.
@@ -427,15 +501,20 @@ function LoadPoints()
     {
         var cCheck = Math.floor(atob(preCheck));
         
-        var pHist = JSON.parse(atob(localStorage.getItem("science_bowl_quiz_af2252024_pointshistory")));
-        pointHistory = pHist;
-        
+        if(localStorage.getItem("science_bowl_quiz_af2252024_pointshistory") != null){
+            var pHist = JSON.parse(atob(localStorage.getItem("science_bowl_quiz_af2252024_pointshistory")));
+            pointHistory = pHist;
+            
+        }
+
+
         UpdatePoints(cCheck, false);
     }else{
         UpdatePoints(0, false);
     }
 }
 
+//TODO: ADD TYPING CLICK NOISE
 function TypeOutText(element, text, charDelay)
 {
     if(!questionActive){return;}
@@ -471,6 +550,8 @@ GetQuestion = (qId, type, setID = 0) => {
 
     const questionPrefix = qId + ") ";
 
+    console.log(setID)
+    console.log(FullQuestionSet[setID])
     const splitArr = FullQuestionSet[setID].split("\n");
 
     document.getElementById("set_num_display").innerHTML = `<em>(${QuestionSetNames[setID]})</em>`;
@@ -613,8 +694,8 @@ const DisplayAnim = async (num, time = 2000) =>
 function quake(times/*, text, red = false*/) 
 { 
 
-    var audio = new Audio('./sounds/COMBO/combo' + (Math.floor(Math.random() * 4) + 1) + ".wav");
-    audio.play();
+   // var audio = new Audio('./sounds/COMBO/combo' + (Math.floor(Math.random() * 4) + 1) + ".wav");
+   // audio.play();
 
     for(i = 0; i < times; i++)
     {
@@ -641,4 +722,46 @@ function quakeOnce()
   setTimeout(() => {
     document.getElementsByTagName('body')[0].setAttribute("style", "margin-left: 0px;");
   }, 45);
+}
+
+function DisplayJoinGamePopup(game)
+{
+    document.getElementById("join_game_popup").setAttribute("style", "");
+
+    var nGame = {id: game.id, data: JSON.parse(game.data)};
+
+    //Make the header say "Join %roomName%?"
+    document.getElementById("join_game_popup").children[0].children[0].textContent = "Join " + nGame.data.info.name + "?";
+
+    var playerList = "";
+
+    if(nGame.data.players.length > 0)
+    {
+        playerList += "<em style='color: " + (nGame.data.players[0].name == GetAccountName() ? "green" : "gold") + ";'>" + nGame.data.players[0].name + " - Team " + nGame.data.players[0].team + "</em><br>";
+    }
+
+    for(var i = 1; i < nGame.data.players.length; i++)
+    {
+        if(nGame.data.players[i].name == GetAccountName())
+        {
+            playerList += "<em style='color: green;'>" + nGame.data.players[i].name + " - Team " + nGame.data.players[i].team + "</em><br>";
+        }else{
+            playerList += nGame.data.players[i].name + " - Team " + nGame.data.players[i].team + "<br>";
+        }
+
+    }
+
+    document.getElementById("room_details_display").innerHTML = `
+        Players:<br><br>${playerList}
+    `;
+
+    document.getElementById("room_settings_display").innerHTML = `
+        Toss-Up Time: ${nGame.data.settings.Time.TossUp}s<br>
+        Bonus Time: ${nGame.data.settings.Time.Bonus}s<br>
+        Read Speed: ${nGame.data.settings.ReadSpeed}ms/c<br>
+        Question Delay: ${nGame.data.settings.QuestionDelay}s<br>
+        Display Answers: ${nGame.data.settings.DisplayAnswerOnFail ? "Yes" : "No"}
+    `;
+
+    document.getElementById("join_game_button").setAttribute("code", game.id);
 }
