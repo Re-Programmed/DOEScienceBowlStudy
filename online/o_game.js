@@ -56,6 +56,21 @@ window.addEventListener('load', function() {
     }
 })
 
+const Messages = ['👋'] 
+
+function CreateSpeechBubble(user, messageID)
+{
+    Array.from(document.getElementById("host_wait_screen").children[2].children).forEach(child => {
+        if(child.textContent == user)
+        {
+            const chatBubble = document.createElement('p');
+            chatBubble.textContent = Messages[messageID]
+            child.appendChild(chatBubble);
+            
+        }
+    });
+}
+
 //Updates what question sets will be used in the current room.
 function HOST_UpdateQPacks()
 {

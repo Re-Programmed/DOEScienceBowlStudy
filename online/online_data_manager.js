@@ -41,6 +41,13 @@ const APIData = {
         return data;
     },
 
+    CreateRoom: async function (id, data)
+    {
+        var data = await basicRequest(URLS.POST(id, JSON.stringify(data)), []);
+
+        return data;
+    },
+
     //Adds a player to the current room.
     //CurrentRoom: room
     //Player: Account

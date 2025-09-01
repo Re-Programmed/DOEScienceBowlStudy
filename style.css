@@ -25,6 +25,14 @@ body
     font-size: 1.2em;
 }
 
+button:disabled
+{
+    background-color: #1c1c29;
+    border: 3px solid #2a2a3a;
+
+    color: gray;
+}
+
 button
 {
     background-color: var(--light-bg);
@@ -36,7 +44,7 @@ button
     transition-duration: 0.2s;
 }
 
-button:hover
+button:hover, button:focus, input:focus
 {
     background-color: var(--medium-bg);
     transform: scale(1.05);
@@ -103,7 +111,12 @@ input, select
     background-color: #FFFFFF11;
 }
 
-#stat_box, #option_box, #select_question_set, #abt_info, #room_listing, #join_game_popup
+#chat_options
+{
+    height: 75px;
+}
+
+#stat_box, #chat_options, #option_box, #select_question_set, #abt_info, #room_listing, #join_game_popup, #room_options
 {
     background-color: #2c2c41;
     margin-left: 15px;
@@ -182,4 +195,10 @@ chfade
     color: white;
     z-index: 7;
     font-family: Arial, Helvetica, sans-serif;
+}
+
+.click_green:active, .click_green::selection
+{
+    background-color: #206320;
+    border: 3px solid #1c531c;
 }

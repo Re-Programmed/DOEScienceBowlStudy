@@ -55,12 +55,26 @@ window.addEventListener('keydown', function(event) {
 
 //%roomID%
 const AVAILABLE_ROOM_HTML = `
-    <center style="border-top: %bt%;"><p style="width: 25%;display: inline-block;">%roomID%</p><p style="width: 25%;display: inline-block;">%numPlayers%</p></center>
+    <center style="border-top: %bt%;"><p style="width: 25%;display: inline-block;">%roomName%</p><p style="width: 25%;display: inline-block;">%roomID%</p><p style="width: 25%;display: inline-block;">%numPlayers%</p></center>
 `
 
 function LoadAvailableRooms()
 {
-    loadRoomHTML({ id: "Room ID", data: "{\"numPlayers\": \"Players\"}" }, "1px solid white")
+    const room_listing = document.getElementById("room_listing");
+    if(room_listing.children.length > 2)
+    {
+       for(var i = 0; i < room_listing.children.length; i++)
+       {
+        if(i > 2)
+        {
+            console.log("REMOVing")
+            room_listing.children[i].remove();
+            i--;
+        }
+       }
+    }
+
+    loadRoomHTML({ id: "Room ID", data: "{\"numPlayers\": \"Players\", \"info\":{\"name\": \"Name\"}}" }, "1px solid white")
     APIData.GetAvailableRooms().then(avRooms => {
         avRooms.forEach(room => {
             loadRoomHTML(room);
@@ -71,7 +85,7 @@ function LoadAvailableRooms()
 const loadRoomHTML = (room, bt = "none") => {
     var div = document.createElement("div");
     div.className = "available_room";
-    div.innerHTML = AVAILABLE_ROOM_HTML.replace(/%roomID%/g, room.id).replace(/%numPlayers%/g, JSON.parse(room.data).numPlayers).replace("%bt%", bt);
+    div.innerHTML = AVAILABLE_ROOM_HTML.replace(/%roomID%/g, room.id).replace(/%numPlayers%/g, JSON.parse(room.data).numPlayers + (JSON.parse(room.data).info.maxp != undefined ? "/" + JSON.parse(room.data).info.maxp : "")).replace(/%roomName%/g, JSON.parse(room.data).info.name).replace("%bt%", bt);
     div.setAttribute("room_data", btoa(JSON.stringify(room)));
 
     if(room.id != "Room ID")
@@ -536,6 +550,8 @@ GetQuestion = (qId, type, setID = 0) => {
 
     const questionPrefix = qId + ") ";
 
+    console.log(setID)
+    console.log(FullQuestionSet[setID])
     const splitArr = FullQuestionSet[setID].split("\n");
 
     document.getElementById("set_num_display").innerHTML = `<em>(${QuestionSetNames[setID]})</em>`;
@@ -713,7 +729,9 @@ function DisplayJoinGamePopup(game)
     document.getElementById("join_game_popup").setAttribute("style", "");
 
     var nGame = {id: game.id, data: JSON.parse(game.data)};
-    console.log(nGame)
+
+    //Make the header say "Join %roomName%?"
+    document.getElementById("join_game_popup").children[0].children[0].textContent = "Join " + nGame.data.info.name + "?";
 
     var playerList = "";
 
